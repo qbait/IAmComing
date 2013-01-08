@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ProximityAlert</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+
+    <string name="notification_ticker">I Am Coming</string>
+    <string name="notification_title">I Am Coming</string>
+    <string name="notification_content">app in standby mode</string>
+
+    <string name="summary_notifications_enabled">Wanna notify Your chick?</string>
+    <string name="title_notifications_enabled">notifications enabled</string>
+    <string name="dialog_title_contact_number">phone number</string>
+    <string name="summary_contact_number">Your chick mobile no.</string>
+    <string name="title_contact_number">phone number</string>
+    <string name="dialog_title_notification_text">notification text</string>
+    <string name="summary_notification_text">How Do You wanna inform Your babe?</string>
+    <string name="title_notification_text">notification text</string>
+    <string name="summary_location">where Your babe live?</string>
+    <string name="title_location">location</string>
+    <string name="dialog_title_radius">distance [km]</string>
+    <string name="summary_radius">from what distance you wanna inform chick about Your visit</string>
+    <string name="title_radius">distance</string>
+
+</resources>

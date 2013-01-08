@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="notifications_enabled"
+            android:summary="@string/summary_notifications_enabled"
+            android:title="@string/title_notifications_enabled"/>
+
+    <pl.qbait.iamcoming.ContactNumberPreferenceDialog
+            android:dialogTitle="@string/dialog_title_contact_number"
+            android:key="contact_number"
+            android:summary="@string/summary_contact_number"
+            android:title="@string/title_contact_number"/>
+
+    <EditTextPreference
+            android:dialogTitle="@string/dialog_title_notification_text"
+            android:inputType="textMultiLine"
+            android:key="notification_text"
+            android:lines="10"
+            android:minLines="2"
+            android:scrollHorizontally="false"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            android:summary="@string/summary_notification_text"
+            android:title="@string/title_notification_text"/>
+
+    <PreferenceScreen
+            android:summary="@string/summary_location"
+            android:title="@string/title_location">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="pl.qbait.iamcoming.MapActivity"
+                android:targetPackage="pl.qbait.iamcoming"/>
+    </PreferenceScreen>
+
+    <EditTextPreference
+            android:defaultValue="10"
+            android:dialogTitle="@string/dialog_title_radius"
+            android:inputType="number"
+            android:key="radius"
+            android:summary="@string/summary_radius"
+            android:title="@string/title_radius"/>
+
+</PreferenceScreen>
