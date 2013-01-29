@@ -1,10 +1,14 @@
 package pl.qbait.iamcoming;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.provider.ContactsContract;
@@ -14,7 +18,7 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
-public class MainActivity extends SherlockPreferenceActivity {
+public class MainActivity extends SherlockPreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String TAG = "MainActivity";
     private static final int PICK_CONTACT = 0;
     Preferences preferences;
@@ -24,24 +28,21 @@ public class MainActivity extends SherlockPreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
-
         preferences = new Preferences(this);
+        addPreferencesFromResource(R.xml.preferences);
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         Preference notificationsEnabledPreference = findPreference("notifications_enabled");
         notificationsEnabledPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Intent intent = new Intent(MainActivity.this, ProximityService.class);
-                if ((Boolean) newValue) {
-                    startService(intent);
-                } else {
-                    stopService(intent);
-                }
-                Log.d(getClass().getSimpleName(), "enabled change");
+                startStopProximityService((Boolean) newValue);
                 return true;
             }
         });
+
+        enableDisableNotificationsEnabledPreference();
+        startStopProximityService( ((CheckBoxPreference)notificationsEnabledPreference).isChecked() );
 
         Preference contactNumberPreference = findPreference("contact_number");
         contactNumberPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -123,4 +124,50 @@ public class MainActivity extends SherlockPreferenceActivity {
         return phoneNumber;
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        enableDisableNotificationsEnabledPreference();
+        if (key.equals(Preferences.PREFERENCE_RADIUS) || key.equals(Preferences.PREFERENCE_LATITUDE) || key.equals(Preferences.PREFERENCE_LONGITUDE)) {
+            restartProximityServiceIfNeeded();
+        }
+    }
+
+    private void restartProximityServiceIfNeeded() {
+        if(isProximityServiceRunning()) {
+            Intent intent = new Intent(MainActivity.this, ProximityService.class);
+            stopService(intent);
+            startService(intent);
+        }
+    }
+
+    private void enableDisableNotificationsEnabledPreference() {
+        CheckBoxPreference notificationsEnabledPreference = (CheckBoxPreference) findPreference("notifications_enabled");
+        if (preferences.isContactNumberSaved() && preferences.isLocationSaved() && preferences.isDistanceSaved()) {
+            notificationsEnabledPreference.setEnabled(true);
+        } else {
+            notificationsEnabledPreference.setEnabled(false);
+            notificationsEnabledPreference.setChecked(false);
+            stopService(new Intent(MainActivity.this, ProximityService.class));
+        }
+    }
+
+    private void startStopProximityService(Boolean start) {
+        Intent intent = new Intent(MainActivity.this, ProximityService.class);
+        if (start) {
+            startService(intent);
+        } else {
+            stopService(intent);
+        }
+        Log.d(getClass().getSimpleName(), "enabled change");
+    }
+
+    private boolean isProximityServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (ProximityService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

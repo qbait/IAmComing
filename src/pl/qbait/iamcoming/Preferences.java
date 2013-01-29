@@ -8,13 +8,13 @@ import com.google.android.gms.maps.model.LatLng;
 public class Preferences {
     SharedPreferences preferences;
 
-    private static final String PREFERENCE_LATITUDE = "latitude";
-    private static final String PREFERENCE_LONGITUDE = "longitude";
-    private static final String PREFERENCE_NOTIFICATIONS_ENABLED = "notifications_enabled";
-    private static final String PREFERENCE_CONTACT_NUMBER = "contact_number";
-    private static final String PREFERENCE_NOTIFICATION_TYPE = "notification_type";
-    private static final String PREFERENCE_RADIUS = "radius";
-    public static final int DEFAULT_PREFERENCE_NUMERIC = 0;
+    public static final String PREFERENCE_LATITUDE = "latitude";
+    public static final String PREFERENCE_LONGITUDE = "longitude";
+    public static final String PREFERENCE_NOTIFICATIONS_ENABLED = "notifications_enabled";
+    public static final String PREFERENCE_CONTACT_NUMBER = "contact_number";
+    public static final String PREFERENCE_NOTIFICATION_TYPE = "notification_type";
+    public static final String PREFERENCE_RADIUS = "radius";
+    public static final int DEFAULT_PREFERENCE_NUMERIC = -1;
     public static final boolean DEFAULT_PREFERENCE_BOOLEAN = false;
     public static final String DEFAULT_PREFERENCE_STRING = "";
 
@@ -23,29 +23,30 @@ public class Preferences {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    public boolean isContactNumberSaved() {
+        return !getContactNumber().equals(DEFAULT_PREFERENCE_STRING);
+    }
+
     public boolean isLocationSaved() {
-        if (getLatitude() == 0 && getLongitude() == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return getLatitude() != DEFAULT_PREFERENCE_NUMERIC || getLongitude() != DEFAULT_PREFERENCE_NUMERIC;
+    }
+
+    public boolean isDistanceSaved() {
+        return !getRadius().equals(DEFAULT_PREFERENCE_STRING);
     }
 
     public LatLng getLocation() {
         double latitude = getLatitude();
         double longitude = getLongitude();
-        LatLng p = new LatLng(latitude, longitude);
-        return p;
+        return new LatLng(latitude, longitude);
     }
 
     public double getLatitude() {
-        double result = Double.longBitsToDouble(getLongPreference(PREFERENCE_LATITUDE));
-        return result;
+        return Double.longBitsToDouble(getLongPreference(PREFERENCE_LATITUDE));
     }
 
     public double getLongitude() {
-        double result = Double.longBitsToDouble(getLongPreference(PREFERENCE_LONGITUDE));
-        return result;
+        return Double.longBitsToDouble(getLongPreference(PREFERENCE_LONGITUDE));
     }
 
     public boolean getNotificationsEnabled() {
@@ -60,8 +61,17 @@ public class Preferences {
         return getStringPreference(PREFERENCE_NOTIFICATION_TYPE);
     }
 
-    public int getRadius() {
-        return getIntPreference(PREFERENCE_RADIUS);
+    public String getRadius() {
+        return getStringPreference(PREFERENCE_RADIUS);
+    }
+
+    public float getRadiusFloat() {
+        String radius = getRadius();
+        if(!radius.equals("")) {
+            return new Float(radius);
+        } else {
+            return 0;
+        }
     }
 
     public void setLocation(double latitude, double longitude) {

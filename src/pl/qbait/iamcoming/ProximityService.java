@@ -12,6 +12,7 @@ import android.util.Log;
 
 public class ProximityService extends Service {
     private static final String TAG = "ProximityService";
+    private Preferences preferences;
     private final String PROX_ALERT = "pl.qbait.iamcoming.intent.action.PROXIMITY_ALERT";
     private ProximityReceiver proximityReceiver = null;
     private LocationManager locationManager = null;
@@ -25,11 +26,9 @@ public class ProximityService extends Service {
     @Override
     public void onCreate() {
         Log.d(TAG, "start service");
+        preferences = new Preferences(this);
         super.onCreate();
-        double lat = 33.324;
-        double lng = -111.867;
-        float radius = 5.0f * 1000.0f;
-        createProximityAlert(lat, lng, radius);
+        createProximityAlert();
         protectServiceAgainstKilling();
     }
 
@@ -40,7 +39,10 @@ public class ProximityService extends Service {
         destroyProximityAlert();
     }
 
-    private void createProximityAlert(double lat, double lng, float radius) {
+    private void createProximityAlert() {
+        double lat = preferences.getLatitude();
+        double lng = preferences.getLongitude();
+        float radius = preferences.getRadiusFloat();
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         String geo = "geo:" + lat + "," + lng;
         Intent intent = new Intent(PROX_ALERT, Uri.parse(geo));
@@ -64,7 +66,7 @@ public class ProximityService extends Service {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        Notification notice = new Notification(R.drawable.ic_launcher, getText(R.string.notification_ticker), System.currentTimeMillis());
+        Notification notice = new Notification(R.drawable.ic_stat_notifications_enabled, getText(R.string.notification_ticker), System.currentTimeMillis());
 
         notice.setLatestEventInfo(this, getText(R.string.notification_title), getText(R.string.notification_content), pendIntent);
 
