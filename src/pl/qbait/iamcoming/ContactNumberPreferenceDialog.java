@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -63,6 +64,7 @@ public class ContactNumberPreferenceDialog extends DialogPreference {
     @Override
     protected void showDialog(Bundle state) {
         super.showDialog(state);
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         moveCursorToEnd(numberEditText);
 
     }
