@@ -53,6 +53,7 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
         super.onCreate(savedInstanceState);
         preferences = new Preferences(this);
         setContentView(R.layout.activity_map);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setUpMapIfNeeded();
 
         if (savedInstanceState != null && savedInstanceState.containsKey("latitude")) {
@@ -183,6 +184,9 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
         switch (item.getItemId()) {
             case R.id.menu_map_current_location:
                 showCurrenLocation();
+                break;
+            case android.R.id.home:
+                finish();
                 break;
         }
         return true;
