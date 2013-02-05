@@ -25,6 +25,7 @@ public class ContactNumberPreferenceDialog extends DialogPreference {
         View view = super.onCreateDialogView();
         numberEditText = (EditText) view.findViewById(R.id.edittext_number);
         pickContactButton = (ImageButton) view.findViewById(R.id.imagebutton_pick_contact);
+        //getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         return view;
     }
 
