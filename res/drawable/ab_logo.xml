@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:drawable="@drawable/ic_launcher"
+            android:left="@dimen/logo_padding_side"
+            android:right="@dimen/logo_padding_side"/>
+</layer-list>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="Mint.Holo.Theme" parent="Holo.Theme">
+        <item name="alertDialogStyle">@style/Holo.AlertDialog</item>
+        <item name="actionBarItemBackground">@drawable/selectable_background_holo_dark</item>
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_holo_dark</item>
+        <item name="android:windowBackground">@drawable/background_holo_dark</item>
+        <item name="holoActionBarTheme">light</item>
+        <item name="actionBarStyle">@style/example_solid_ActionBar</item>
+        <item name="android:actionBarStyle">@style/example_solid_ActionBar</item>
+        <item name="android:editTextStyle">@style/Holo.EditText</item>
+        <item name="switchStyle">@style/Holo.Switch</item>
+        <item name="android:imageButtonStyle">@style/Holo.ImageButton</item>
+        <item name="android:listViewStyle">@style/Holo.ListView</item>
+    </style>
+
+    <style name="Holo.AlertDialog">
+        <item name="layout">@layout/alert_dialog_holo</item>
+
+        <item name="bottomBright">@drawable/dialog_bottom_holo_dark</item>
+        <item name="bottomDark">@drawable/dialog_bottom_holo_dark</item>
+        <item name="bottomMedium">@drawable/dialog_bottom_holo_dark</item>
+        <item name="centerBright">@drawable/dialog_middle_holo_dark</item>
+        <item name="centerDark">@drawable/dialog_middle_holo_dark</item>
+        <item name="centerMedium">@drawable/dialog_middle_holo_dark</item>
+        <item name="topBright">@drawable/dialog_top_holo_dark</item>
+        <item name="topDark">@drawable/dialog_top_holo_dark</item>
+    </style>
+
+    <style name="example_solid_ActionBar" parent="@style/Widget.Sherlock.ActionBar.Solid">
+        <item name="background">@drawable/ab_solid_example</item>
+        <item name="android:background">@drawable/ab_solid_example</item>
+        <item name="titleTextStyle">@style/MyTheme.ActionBar.TitleTextStyle</item>
+        <item name="android:titleTextStyle">@style/MyTheme.ActionBar.TitleTextStyle</item>
+        <item name="icon">@drawable/ab_logo</item>
+        <item name="android:icon">@drawable/ab_logo</item>
+    </style>
+
+    <style name="Holo.EditText">
+        <item name="android:background">@drawable/edit_text_holo_dark</item>
+    </style>
+
+
+    <style name="Holo.Switch">
+        <item name="track">@drawable/switch_track_holo_dark</item>
+        <item name="thumb">@drawable/switch_inner_holo_dark</item>
+        <item name="switchTextAppearance">@style/Holo.Switch.TextAppearance</item>
+        <item name="textOn">@string/capital_on</item>
+        <item name="textOff">@string/capital_off</item>
+    </style>
+
+    <style name="Holo.Switch.TextAppearance" parent="@style/Holo.TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@drawable/switch_text_color</item>
+    </style>
+
+    <style name="Holo.ImageButton">
+        <item name="android:background">@drawable/btn_default_holo_dark</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:scaleType">center</item>
+    </style>
+
+    <style name="Holo.ListView" parent="@android:style/Widget.ListView">
+        <item name="android:listSelector">@drawable/list_selector_holo_dark</item>
+    </style>
+
+    <style name="MyTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#FFF</item>
+
+    </style>
+</resources>

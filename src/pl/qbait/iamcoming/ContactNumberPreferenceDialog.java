@@ -3,7 +3,7 @@ package pl.qbait.iamcoming;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.preference.DialogPreference;
+import org.holoeverywhere.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.WindowManager;

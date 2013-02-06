@@ -4,21 +4,17 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import org.holoeverywhere.preference.*;
 
-public class MainActivity extends SherlockPreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class MainActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String TAG = "MainActivity";
     private static final int PICK_CONTACT = 0;
     Preferences preferences;
@@ -42,7 +38,7 @@ public class MainActivity extends SherlockPreferenceActivity implements SharedPr
         });
 
         enableDisableNotificationsEnabledPreference();
-        startStopProximityService( ((CheckBoxPreference)notificationsEnabledPreference).isChecked() );
+        startStopProximityService( ((SwitchPreference)notificationsEnabledPreference).isChecked() );
 
         Preference contactNumberPreference = findPreference("contact_number");
         contactNumberPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -141,7 +137,7 @@ public class MainActivity extends SherlockPreferenceActivity implements SharedPr
     }
 
     private void enableDisableNotificationsEnabledPreference() {
-        CheckBoxPreference notificationsEnabledPreference = (CheckBoxPreference) findPreference("notifications_enabled");
+        SwitchPreference notificationsEnabledPreference = (SwitchPreference) findPreference("notifications_enabled");
         if (preferences.isContactNumberSaved() && preferences.isLocationSaved() && preferences.isDistanceSaved()) {
             notificationsEnabledPreference.setEnabled(true);
         } else {
@@ -158,7 +154,7 @@ public class MainActivity extends SherlockPreferenceActivity implements SharedPr
         } else {
             stopService(intent);
         }
-        Log.d(getClass().getSimpleName(), "enabled change");
+        Log.d(TAG, "enabled change");
     }
 
     private boolean isProximityServiceRunning() {

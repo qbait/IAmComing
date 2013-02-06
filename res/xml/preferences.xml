@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:key="notifications_enabled"
-            android:summary="@string/summary_notifications_enabled"
-            android:title="@string/title_notifications_enabled"
-            android:icon="@drawable/ic_settings_power"/>
+<PreferenceScreen xmlns:holo="http://schemas.android.com/apk/res-auto"
+                  xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+            holo:key="notifications_enabled"
+            holo:summary="@string/summary_notifications_enabled"
+            holo:title="@string/title_notifications_enabled"
+            holo:icon="@drawable/ic_settings_power"/>
 
     <pl.qbait.iamcoming.ContactNumberPreferenceDialog
-            android:dialogTitle="@string/dialog_title_contact_number"
-            android:key="contact_number"
-            android:summary="@string/summary_contact_number"
-            android:title="@string/title_contact_number"
-            android:icon="@drawable/ic_settings_phone"/>
+            holo:dialogTitle="@string/dialog_title_contact_number"
+            holo:key="contact_number"
+            holo:summary="@string/summary_contact_number"
+            holo:title="@string/title_contact_number"
+            holo:icon="@drawable/ic_settings_phone"/>
 
     <EditTextPreference
-            android:dialogTitle="@string/dialog_title_notification_text"
+            holo:dialogTitle="@string/dialog_title_notification_text"
             android:inputType="textMultiLine"
-            android:key="notification_text"
+            holo:key="notification_text"
             android:lines="10"
             android:minLines="2"
             android:scrollHorizontally="false"
             android:scrollbars="vertical"
             android:singleLine="false"
-            android:summary="@string/summary_notification_text"
-            android:title="@string/title_notification_text"
-            android:icon="@drawable/ic_settings_text"/>
+            holo:summary="@string/summary_notification_text"
+            holo:title="@string/title_notification_text"
+            holo:icon="@drawable/ic_settings_text"/>
 
     <PreferenceScreen
-            android:summary="@string/summary_location"
-            android:title="@string/title_location"
-            android:key="location"
-            android:icon="@drawable/ic_settings_location">
+            holo:summary="@string/summary_location"
+            holo:title="@string/title_location"
+            holo:key="location"
+            holo:icon="@drawable/ic_settings_location">
         <intent
                 android:action="android.intent.action.VIEW"
                 android:targetClass="pl.qbait.iamcoming.MapActivity"
@@ -40,11 +41,11 @@
 
     <EditTextPreference
             android:defaultValue="10"
-            android:dialogTitle="@string/dialog_title_radius"
+            holo:dialogTitle="@string/dialog_title_radius"
             android:inputType="numberDecimal"
-            android:key="radius"
-            android:summary="@string/summary_radius"
-            android:title="@string/title_radius"
-            android:icon="@drawable/ic_settings_radius"/>
+            holo:key="radius"
+            holo:summary="@string/summary_radius"
+            holo:title="@string/title_radius"
+            holo:icon="@drawable/ic_settings_radius"/>
 
 </PreferenceScreen>
