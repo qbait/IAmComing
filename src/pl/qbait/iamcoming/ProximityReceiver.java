@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.*;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
+import org.holoeverywhere.widget.Toast;
 
 import java.util.List;
 import java.util.Locale;
@@ -28,7 +30,17 @@ public class ProximityReceiver extends BroadcastReceiver {
     }
 
     private void sendSms(String address) {
-        Log.d(TAG, String.format("sms sending - address: %s, phoneNumber: %s", address, preferences.getContactNumber()));
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            String message = preferences.getNotificationText();
+            String recipient = preferences.getContactNumber();
+            smsManager.sendTextMessage(recipient, null, message, null, null);
+            Log.d(TAG, String.format("sms sending - address: %s, recipient: %s, message: %s", address, recipient, message));
+        } catch (Exception e) {
+            Toast.makeText(context, "SMS faild, please try again later!", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+
     }
 
     private String getCurrentAddress() {

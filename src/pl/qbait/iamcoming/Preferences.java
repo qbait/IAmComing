@@ -12,7 +12,7 @@ public class Preferences {
     public static final String PREFERENCE_LONGITUDE = "longitude";
     public static final String PREFERENCE_NOTIFICATIONS_ENABLED = "notifications_enabled";
     public static final String PREFERENCE_CONTACT_NUMBER = "contact_number";
-    public static final String PREFERENCE_NOTIFICATION_TYPE = "notification_type";
+    public static final String PREFERENCE_NOTIFICATION_TEXT = "notification_text";
     public static final String PREFERENCE_RADIUS = "radius";
     public static final int DEFAULT_PREFERENCE_NUMERIC = -1;
     public static final boolean DEFAULT_PREFERENCE_BOOLEAN = false;
@@ -57,8 +57,8 @@ public class Preferences {
         return getStringPreference(PREFERENCE_CONTACT_NUMBER);
     }
 
-    public String getNotificationType() {
-        return getStringPreference(PREFERENCE_NOTIFICATION_TYPE);
+    public String getNotificationText() {
+        return getStringPreference(PREFERENCE_NOTIFICATION_TEXT);
     }
 
     public String getRadius() {
@@ -102,8 +102,8 @@ public class Preferences {
         setStringPreference(PREFERENCE_CONTACT_NUMBER, value);
     }
 
-    public void setNotificationType(String value) {
-        setStringPreference(PREFERENCE_NOTIFICATION_TYPE, value);
+    public void setNotificationText(String value) {
+        setStringPreference(PREFERENCE_NOTIFICATION_TEXT, value);
     }
 
     public void setRadius(int value) {
