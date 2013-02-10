@@ -9,11 +9,11 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //ACRA.init(this);
+        ACRA.init(this);
     }
 
     static {
         config().debugMode.setValue(true);
-        config().preferenceImpl.setValue(org.holoeverywhere.app.Application.Config.PreferenceImpl.JSON);
+        config().preferenceImpl.setValue(org.holoeverywhere.app.Application.Config.PreferenceImpl.XML);
     }
 }

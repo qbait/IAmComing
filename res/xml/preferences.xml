@@ -28,17 +28,6 @@
             holo:title="@string/title_notification_text"
             holo:icon="@drawable/ic_settings_text"/>
 
-    <PreferenceScreen
-            holo:summary="@string/summary_location"
-            holo:title="@string/title_location"
-            holo:key="location"
-            holo:icon="@drawable/ic_settings_location">
-        <intent
-                android:action="android.intent.action.VIEW"
-                android:targetClass="pl.qbait.iamcoming.MapActivity"
-                android:targetPackage="pl.qbait.iamcoming"/>
-    </PreferenceScreen>
-
     <EditTextPreference
             android:defaultValue="10"
             holo:dialogTitle="@string/dialog_title_radius"
@@ -47,5 +36,12 @@
             holo:summary="@string/summary_radius"
             holo:title="@string/title_radius"
             holo:icon="@drawable/ic_settings_radius"/>
+
+    <PreferenceScreen
+            holo:summary="@string/summary_location"
+            holo:title="@string/title_location"
+            holo:key="location"
+            holo:icon="@drawable/ic_settings_location">
+    </PreferenceScreen>
 
 </PreferenceScreen>
