@@ -94,7 +94,7 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
         marker = mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("save")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                .icon(BitmapDescriptorFactory.defaultMarker(160.0f)));
         marker.showInfoWindow();
     }
 
