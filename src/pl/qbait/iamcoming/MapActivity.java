@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package pl.qbait.iamcoming;
 
 import android.app.AlertDialog;
@@ -23,14 +7,11 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -119,62 +100,45 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        final SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
+        searchView.setQueryHint("Search…");
 
-        getSupportMenuInflater().inflate(R.menu.activity_map, menu);
-        createSearchEditTextLogic(menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    private void createSearchEditTextLogic(Menu menu) {
-        final MenuItem searchMenuItem = menu.findItem(R.id.menu_map_search);
-        final EditText searchEditText = (EditText) searchMenuItem.getActionView();
-
-        searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        MenuItem.OnMenuItemClickListener currentLocationListener = new MenuItem.OnMenuItemClickListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    searchMenuItem.collapseActionView();
-                    try {
-                        searchLocation(searchEditText.getText().toString());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Log.d("TAG", "Search");
-                    return true;
+            public boolean onMenuItemClick(MenuItem item) {
+                showCurrenLocation();
+                return true;
+            }
+        };
+
+        menu.add("Search")
+                .setIcon(R.drawable.ic_menu_search)
+                .setActionView(searchView)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+
+        menu.add("Current location").setOnMenuItemClickListener(currentLocationListener)
+                .setIcon(R.drawable.ic_menu_mylocation)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                try {
+                    searchLocation(query);
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 return false;
             }
-        });
-
-        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                searchEditText.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        searchEditText.requestFocus();
-                        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputMethodManager.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
-                    }
-                });
-                Log.d("TAG", "expanded");
-                return true;
-            }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                searchEditText.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputMethodManager.hideSoftInputFromWindow(searchEditText.getWindowToken(), 0);
-                    }
-                });
-                Log.d("TAG", "collapsed");
-                return true;
+            public boolean onQueryTextChange(String newText) {
+                return false;
             }
         });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -182,9 +146,6 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
         super.onOptionsItemSelected(item);
 
         switch (item.getItemId()) {
-            case R.id.menu_map_current_location:
-                showCurrenLocation();
-                break;
             case android.R.id.home:
                 finish();
                 break;
