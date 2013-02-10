@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -101,6 +102,8 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         final SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
+        styleSearchView(searchView);
+
         searchView.setQueryHint("Search…");
 
         MenuItem.OnMenuItemClickListener currentLocationListener = new MenuItem.OnMenuItemClickListener() {
@@ -194,5 +197,10 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
     public void onInfoWindowClick(Marker marker) {
         saveLocation(marker);
         finish();
+    }
+
+    private static void styleSearchView(SearchView searchView) {
+        View searchPlate = searchView.findViewById(R.id.abs__search_plate);
+        searchPlate.setBackgroundResource(R.drawable.textfield_searchview_holo_dark);
     }
 }
