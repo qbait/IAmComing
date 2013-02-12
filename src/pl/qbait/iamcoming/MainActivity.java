@@ -10,21 +10,20 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 import org.holoeverywhere.preference.*;
 
-public class MainActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class MainActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "MainActivity";
     private static final int PICK_CONTACT = 0;
     Preferences preferences;
     ContactNumberPreferenceDialog contactNumberPreferenceDialog;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,17 +32,11 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
         addPreferencesFromResource(R.xml.preferences);
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-        Preference notificationsEnabledPreference = findPreference("notifications_enabled");
-        notificationsEnabledPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                startStopProximityService((Boolean) newValue);
-                return true;
-            }
-        });
-
-        enableDisableNotificationsEnabledPreference();
-        startStopProximityService( ((SwitchPreference)notificationsEnabledPreference).isChecked() );
+        if (preferences.getNotificationsEnabled() && validateNotificationsEnabled()) {
+            startProximityService();
+        } else {
+            stopProximityService();
+        }
 
         Preference contactNumberPreference = findPreference("contact_number");
         contactNumberPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -100,6 +93,29 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
     }
 
     @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(Preferences.PREFERENCE_NOTIFICATIONS_ENABLED)) {
+            SwitchPreference switchPreference = (SwitchPreference) findPreference("notifications_enabled");
+            if ( preferences.getNotificationsEnabled() && validateNotificationsEnabled()) {
+                startProximityService();
+                //switchPreference.setChecked(true);
+            } else {
+                stopProximityService();
+                switchPreference.setChecked(false);
+            }
+        }
+        if (key.equals(Preferences.PREFERENCE_RADIUS) || key.equals(Preferences.PREFERENCE_LATITUDE) || key.equals(Preferences.PREFERENCE_LONGITUDE)) {
+            if( preferences.getNotificationsEnabled() && validateNotificationsEnabled() ) {
+                restartProximityServiceIfRunning();
+            } else {
+                stopProximityService();
+                SwitchPreference switchPreference = (SwitchPreference) findPreference("notifications_enabled");
+                switchPreference.setChecked(false);
+            }
+        }
+    }
+
+    @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
         switch (reqCode) {
@@ -134,41 +150,34 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
         return phoneNumber;
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        enableDisableNotificationsEnabledPreference();
-        if (key.equals(Preferences.PREFERENCE_RADIUS) || key.equals(Preferences.PREFERENCE_LATITUDE) || key.equals(Preferences.PREFERENCE_LONGITUDE)) {
-            restartProximityServiceIfNeeded();
+    private boolean validateNotificationsEnabled() {
+        if (!preferences.isMandatoryPreferencesEnabled()) {
+            Toast.makeText(MainActivity.this, "complete the following preferences", Toast.LENGTH_LONG).show();
+            return false;
+        } else if (!locationAccessEnabled()) {
+            buildAlertMessageNoLocationAccess();
+            return false;
         }
+
+        return true;
     }
 
-    private void restartProximityServiceIfNeeded() {
-        if(isProximityServiceRunning()) {
+    private void startProximityService() {
+        Intent intent = new Intent(MainActivity.this, ProximityService.class);
+        startService(intent);
+    }
+
+    private void stopProximityService() {
+        Intent intent = new Intent(MainActivity.this, ProximityService.class);
+        stopService(intent);
+    }
+
+    private void restartProximityServiceIfRunning() {
+        if (isProximityServiceRunning()) {
             Intent intent = new Intent(MainActivity.this, ProximityService.class);
             stopService(intent);
             startService(intent);
         }
-    }
-
-    private void enableDisableNotificationsEnabledPreference() {
-        SwitchPreference notificationsEnabledPreference = (SwitchPreference) findPreference("notifications_enabled");
-        if (preferences.isContactNumberSaved() && preferences.isLocationSaved() && preferences.isDistanceSaved()) {
-            notificationsEnabledPreference.setEnabled(true);
-        } else {
-            notificationsEnabledPreference.setEnabled(false);
-            notificationsEnabledPreference.setChecked(false);
-            stopService(new Intent(MainActivity.this, ProximityService.class));
-        }
-    }
-
-    private void startStopProximityService(Boolean start) {
-        Intent intent = new Intent(MainActivity.this, ProximityService.class);
-        if (start) {
-            startService(intent);
-        } else {
-            stopService(intent);
-        }
-        Log.d(TAG, "enabled change");
     }
 
     private boolean isProximityServiceRunning() {
@@ -181,27 +190,43 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
         return false;
     }
 
+    private boolean locationAccessEnabled() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    private void buildAlertMessageNoLocationAccess() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
 
     private void startMapOrInstallGooglePlayServices() {
         // See if google play services are installed.
         boolean services = false;
-        try
-        {
+        try {
             ApplicationInfo info = getPackageManager().getApplicationInfo("com.google.android.gms", 0);
             services = true;
-        }
-        catch(PackageManager.NameNotFoundException e)
-        {
+        } catch (PackageManager.NameNotFoundException e) {
             services = false;
         }
 
-        if (services)
-        {
+        if (services) {
             startActivity(new Intent(MainActivity.this, MapActivity.class));
             return;
-        }
-        else
-        {
+        } else {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
             // set dialog message
@@ -210,28 +235,22 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
                     .setMessage("The map requires Google Play Services to be installed.")
                     .setCancelable(true)
                     .setPositiveButton("Install", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,int id) {
+                        public void onClick(DialogInterface dialog, int id) {
                             dialog.dismiss();
                             // Try the new HTTP method (I assume that is the official way now given that google uses it).
-                            try
-                            {
+                            try {
                                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.google.android.gms"));
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
                                 intent.setPackage("com.android.vending");
                                 startActivity(intent);
-                            }
-                            catch (ActivityNotFoundException e)
-                            {
+                            } catch (ActivityNotFoundException e) {
                                 // Ok that didn't work, try the market method.
-                                try
-                                {
+                                try {
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.gms"));
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
                                     intent.setPackage("com.android.vending");
                                     startActivity(intent);
-                                }
-                                catch (ActivityNotFoundException f)
-                                {
+                                } catch (ActivityNotFoundException f) {
                                     // Ok, weird. Maybe they don't have any market app. Just show the website.
 
                                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.google.android.gms"));
@@ -241,8 +260,8 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
                             }
                         }
                     })
-                    .setNegativeButton("No",new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,int id) {
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
                             dialog.cancel();
                         }
                     })

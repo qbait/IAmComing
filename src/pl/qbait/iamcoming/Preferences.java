@@ -27,12 +27,20 @@ public class Preferences {
         return !getContactNumber().equals(DEFAULT_PREFERENCE_STRING);
     }
 
+    public boolean isNotificationTextSaved() {
+        return !getNotificationText().equals(DEFAULT_PREFERENCE_STRING);
+    }
+
     public boolean isLocationSaved() {
-        return getLatitude() != DEFAULT_PREFERENCE_NUMERIC || getLongitude() != DEFAULT_PREFERENCE_NUMERIC;
+        return getLongPreference(PREFERENCE_LATITUDE) != DEFAULT_PREFERENCE_NUMERIC || getLongPreference(PREFERENCE_LATITUDE) != DEFAULT_PREFERENCE_NUMERIC;
     }
 
     public boolean isDistanceSaved() {
         return !getRadius().equals(DEFAULT_PREFERENCE_STRING);
+    }
+
+    public boolean isMandatoryPreferencesEnabled() {
+        return isContactNumberSaved() && isLocationSaved() && isDistanceSaved() && isNotificationTextSaved();
     }
 
     public LatLng getLocation() {
