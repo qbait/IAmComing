@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import org.holoeverywhere.app.Activity;
 import pl.qbait.iamcoming.utils.Preferences;
 import pl.qbait.iamcoming.R;
 import pl.qbait.iamcoming.utils.LocationAccess;
@@ -28,7 +29,7 @@ import pl.qbait.iamcoming.utils.MyLocation;
 import java.io.IOException;
 import java.util.List;
 
-public class MapActivity extends SherlockFragmentActivity implements GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener {
+public class MapActivity extends Activity implements GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener {
     private static final String TAG = "MapActivity";
     private GoogleMap mMap;
     private Marker marker;
@@ -118,7 +119,6 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
                 } else {
                     LocationAccess.buildAlertDialog(MapActivity.this);
                 }
-
                 return true;
             }
         };
