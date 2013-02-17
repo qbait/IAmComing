@@ -8,7 +8,7 @@
             holo:title="@string/title_notifications_enabled"
             holo:icon="@drawable/ic_settings_power"/>
 
-    <pl.qbait.iamcoming.ContactNumberPreferenceDialog
+    <pl.qbait.iamcoming.dialogs.ContactNumberPreferenceDialog
             holo:dialogTitle="@string/dialog_title_contact_number"
             holo:key="contact_number"
             holo:summary="@string/summary_contact_number"

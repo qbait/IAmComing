@@ -1,4 +1,4 @@
-package pl.qbait.iamcoming;
+package pl.qbait.iamcoming.services;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -8,6 +8,10 @@ import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.util.Log;
+import pl.qbait.iamcoming.R;
+import pl.qbait.iamcoming.activities.MainActivity;
+import pl.qbait.iamcoming.receivers.ProximityReceiver;
+import pl.qbait.iamcoming.utils.Preferences;
 
 public class ProximityService extends Service {
     private static final String TAG = "ProximityService";

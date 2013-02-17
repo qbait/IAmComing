@@ -3,6 +3,7 @@ package pl.qbait.iamcoming;
 import org.holoeverywhere.app.Application;
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
+import pl.qbait.iamcoming.utils.Preferences;
 
 @ReportsCrashes( formKey = "dGxXSlViaVNmamREWHV5WS11ekpWYlE6MQ")
 public class App extends Application {
@@ -18,7 +19,6 @@ public class App extends Application {
             preferences.setNotificationText(getString(R.string.default_notification_text));
             preferences.setFirstRun(false);
         }
-
     }
 
     static {

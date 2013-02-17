@@ -1,4 +1,4 @@
-package pl.qbait.iamcoming;
+package pl.qbait.iamcoming.activities;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -20,6 +20,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import pl.qbait.iamcoming.utils.Preferences;
+import pl.qbait.iamcoming.R;
+import pl.qbait.iamcoming.utils.LocationAccess;
+import pl.qbait.iamcoming.utils.MyLocation;
 
 import java.io.IOException;
 import java.util.List;
@@ -109,7 +113,12 @@ public class MapActivity extends SherlockFragmentActivity implements GoogleMap.O
         MenuItem.OnMenuItemClickListener currentLocationListener = new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                showCurrenLocation();
+                if (LocationAccess.enabled(MapActivity.this)) {
+                    showCurrenLocation();
+                } else {
+                    LocationAccess.buildAlertDialog(MapActivity.this);
+                }
+
                 return true;
             }
         };

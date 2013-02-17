@@ -1,4 +1,4 @@
-package pl.qbait.iamcoming;
+package pl.qbait.iamcoming.dialogs;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import pl.qbait.iamcoming.R;
 
 public class ContactNumberPreferenceDialog extends DialogPreference {
     private EditText numberEditText;

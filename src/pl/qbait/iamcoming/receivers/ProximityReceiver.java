@@ -1,4 +1,4 @@
-package pl.qbait.iamcoming;
+package pl.qbait.iamcoming.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,7 +9,8 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import org.holoeverywhere.widget.Toast;
-import pl.qbait.iamcoming.mail.GMailSender;
+import pl.qbait.iamcoming.utils.Preferences;
+import pl.qbait.iamcoming.utils.mail.GMailSender;
 
 import java.util.List;
 import java.util.Locale;

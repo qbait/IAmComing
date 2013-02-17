@@ -1,16 +1,10 @@
-package pl.qbait.iamcoming;
+package pl.qbait.iamcoming.activities;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -19,6 +13,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 import org.holoeverywhere.preference.*;
+import pl.qbait.iamcoming.dialogs.ContactNumberPreferenceDialog;
+import pl.qbait.iamcoming.utils.Preferences;
+import pl.qbait.iamcoming.services.ProximityService;
+import pl.qbait.iamcoming.R;
+import pl.qbait.iamcoming.utils.GooglePlayServices;
+import pl.qbait.iamcoming.utils.LocationAccess;
+
 import java.util.ArrayList;
 
 public class MainActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -158,8 +159,8 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
             String validationMessage = String.format("%s: %s", getString(R.string.complete_alert), TextUtils.join(", ", missingPreferences) );
             Toast.makeText(MainActivity.this, validationMessage, Toast.LENGTH_LONG).show();
             return false;
-        } else if (!locationAccessEnabled()) {
-            buildAlertMessageNoLocationAccess();
+        } else if (!LocationAccess.enabled(MainActivity.this)) {
+            LocationAccess.buildAlertDialog(MainActivity.this);
             return false;
         }
 
@@ -211,83 +212,12 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
         return missingPreferences;
     }
 
-    private boolean locationAccessEnabled() {
-        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-    }
-
-    private void buildAlertMessageNoLocationAccess() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-
     private void startMapOrInstallGooglePlayServices() {
-        // See if google play services are installed.
-        boolean services = false;
-        try {
-            ApplicationInfo info = getPackageManager().getApplicationInfo("com.google.android.gms", 0);
-            services = true;
-        } catch (PackageManager.NameNotFoundException e) {
-            services = false;
-        }
-
-        if (services) {
+        if (GooglePlayServices.isInstalled(MainActivity.this)) {
             startActivity(new Intent(MainActivity.this, MapActivity.class));
             return;
         } else {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-
-            // set dialog message
-            alertDialogBuilder
-                    .setTitle("Google Play Services")
-                    .setMessage("The map requires Google Play Services to be installed.")
-                    .setCancelable(true)
-                    .setPositiveButton("Install", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                            // Try the new HTTP method (I assume that is the official way now given that google uses it).
-                            try {
-                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.google.android.gms"));
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                                intent.setPackage("com.android.vending");
-                                startActivity(intent);
-                            } catch (ActivityNotFoundException e) {
-                                // Ok that didn't work, try the market method.
-                                try {
-                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.gms"));
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                                    intent.setPackage("com.android.vending");
-                                    startActivity(intent);
-                                } catch (ActivityNotFoundException f) {
-                                    // Ok, weird. Maybe they don't have any market app. Just show the website.
-
-                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.google.android.gms"));
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                                    startActivity(intent);
-                                }
-                            }
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    })
-                    .create()
-                    .show();
+            GooglePlayServices.buildInstallationDialog(MainActivity.this);
         }
     }
 }

@@ -1,4 +1,4 @@
-package pl.qbait.iamcoming.mail;
+package pl.qbait.iamcoming.utils.mail;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;

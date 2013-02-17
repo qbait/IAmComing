@@ -1,4 +1,4 @@
-package pl.qbait.iamcoming;
+package pl.qbait.iamcoming.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
