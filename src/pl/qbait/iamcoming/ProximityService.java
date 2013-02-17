@@ -6,7 +6,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -25,7 +24,6 @@ public class ProximityService extends Service {
 
     @Override
     public void onCreate() {
-        Log.d(TAG, "start service");
         preferences = new Preferences(this);
         super.onCreate();
         createProximityAlert();
@@ -34,7 +32,6 @@ public class ProximityService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "stop service");
         super.onDestroy();
         destroyProximityAlert();
     }
@@ -44,18 +41,18 @@ public class ProximityService extends Service {
         double lng = preferences.getLongitude();
         float radius = preferences.getRadiusFloat();
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
-        String geo = "geo:" + lat + "," + lng;
-        Intent intent = new Intent(PROX_ALERT, Uri.parse(geo));
+        Intent intent = new Intent(PROX_ALERT);
         pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        locationManager.addProximityAlert(lat, lng, radius, -1L, pendingIntent);
+        locationManager.addProximityAlert(lat, lng, radius * 1000, -1L, pendingIntent);
         proximityReceiver = new ProximityReceiver();
         IntentFilter intentFilter = new IntentFilter(PROX_ALERT);
-        intentFilter.addDataScheme("geo");
         registerReceiver(proximityReceiver, intentFilter);
+        Log.d(TAG, "registerReceiver");
     }
 
     private void destroyProximityAlert() {
         unregisterReceiver(proximityReceiver);
+        Log.d(TAG, "unregisterReceiver");
         locationManager.removeProximityAlert(pendingIntent);
     }
 

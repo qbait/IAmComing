@@ -9,6 +9,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import org.holoeverywhere.widget.Toast;
+import pl.qbait.iamcoming.mail.GMailSender;
 
 import java.util.List;
 import java.util.Locale;
@@ -22,11 +23,31 @@ public class ProximityReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         this.context = context;
         preferences = new Preferences(context);
+
+        LatLng currentLocation = getCurrentLocation();
+        if(getDistanceFromHome(currentLocation) <= 500) {
+            Log.d(TAG, "User is probably in home");
+            return;
+        }
+
         Bundle extras = intent.getExtras();
         if (extras != null && extras.getBoolean(LocationManager.KEY_PROXIMITY_ENTERING)) {
-            String currentAddress = getCurrentAddress();
-            sendSms(currentAddress);
+            Log.d(TAG, "onReceive - entering");
+            Toast.makeText(context, "I am coming - mail sent", Toast.LENGTH_LONG).show();
+            sendEmailWhithoutUserInteraction(currentLocation);
+            //sendSms(currentAddress);
+            //sendEmail();
+        } else {
+            Log.d(TAG, "onReceive - out");
         }
+
+        Log.d(TAG, createLogMessage(currentLocation));
+    }
+
+    private String createLogMessage(LatLng currentLocation) {
+        String address = getAddress(currentLocation);
+        float distance = getDistanceFromHome(currentLocation);
+        return String.format("location: [%s, %s], distance: %s m, address: %s", currentLocation.latitude+"", currentLocation.longitude+"", distance+"", address+"");
     }
 
     private void sendSms(String address) {
@@ -40,11 +61,54 @@ public class ProximityReceiver extends BroadcastReceiver {
             Toast.makeText(context, "SMS faild, please try again later!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
-
     }
 
-    private String getCurrentAddress() {
-        LatLng currentLocation = getCurrentLocation();
+    private void sendEmail(LatLng currentLocation) {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"kuba.szwiec@gmail.com"});
+        i.putExtra(Intent.EXTRA_SUBJECT, "I am coming");
+        i.putExtra(Intent.EXTRA_TEXT   , createLogMessage(currentLocation));
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            context.startActivity(i);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(context, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendEmailWhithoutUserInteraction(final LatLng currentLocation) {
+        Thread thread = new Thread()
+        {
+            @Override
+            public void run() {
+                try {
+                    GMailSender sender = new GMailSender("qbks88@gmail.com", "kuba2210");
+                    sender.sendMail("I am coming",
+                            createLogMessage(currentLocation),
+                            "qbks88@gmail.com",
+                            "kuba.szwiec@gmail.com");
+                } catch (Exception e) {
+                    Log.e("SendMail", e.getMessage(), e);
+                }
+            }
+        };
+        thread.start();
+    }
+
+    private float getDistanceFromHome(LatLng location) {
+        LatLng home = preferences. getLocation();
+        Location homeLocation = new Location("homeLocation");
+        homeLocation.setLatitude(home.latitude);
+        homeLocation.setLongitude(home.longitude);
+        Location currentLocation = new Location("currentLocation");
+        currentLocation.setLatitude(location.latitude);
+        currentLocation.setLongitude(location.longitude);
+        float distance = currentLocation.distanceTo(homeLocation);
+        return distance;
+    }
+
+    private String getAddress(LatLng currentLocation) {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         String formattedAddress = null;
         try {
@@ -73,7 +137,6 @@ public class ProximityReceiver extends BroadcastReceiver {
             Location location = locationManager.getLastKnownLocation(provider);
             if (location != null) {
                 LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                System.out.println("Current Lat,Long : " + currentLocation);
                 return currentLocation;
             } else {
                 return null;
