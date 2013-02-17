@@ -108,6 +108,10 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
             }
         }
         if (key.equals(Preferences.PREFERENCE_RADIUS) || key.equals(Preferences.PREFERENCE_LATITUDE) || key.equals(Preferences.PREFERENCE_LONGITUDE)) {
+            if( key.equals(Preferences.PREFERENCE_RADIUS) && preferences.getRadius().equals("0") ) {
+                EditTextPreference radiusPreference = (EditTextPreference) findPreference("radius");
+                radiusPreference.setText("");
+            }
             if( preferences.getNotificationsEnabled() && validateNotificationsEnabled() ) {
                 restartProximityServiceIfRunning();
             } else {

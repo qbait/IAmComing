@@ -119,8 +119,8 @@ public class Preferences {
         setStringPreference(PREFERENCE_NOTIFICATION_TEXT, value);
     }
 
-    public void setRadius(int value) {
-        setIntPreference(PREFERENCE_RADIUS, value);
+    public void setRadius(String value) {
+        setStringPreference(PREFERENCE_RADIUS, value);
     }
 
     public void setFirstRun(boolean value) {
