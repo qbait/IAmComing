@@ -14,10 +14,12 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 import org.holoeverywhere.preference.*;
+import java.util.ArrayList;
 
 public class MainActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "MainActivity";
@@ -151,8 +153,10 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
     }
 
     private boolean validateNotificationsEnabled() {
-        if (!preferences.isMandatoryPreferencesEnabled()) {
-            Toast.makeText(MainActivity.this, "complete the following preferences", Toast.LENGTH_LONG).show();
+        ArrayList<String> missingPreferences = getMissingPreferences();
+        if (!missingPreferences.isEmpty()) {
+            String validationMessage = String.format("%s: %s", getString(R.string.complete_alert), TextUtils.join(", ", missingPreferences) );
+            Toast.makeText(MainActivity.this, validationMessage, Toast.LENGTH_LONG).show();
             return false;
         } else if (!locationAccessEnabled()) {
             buildAlertMessageNoLocationAccess();
@@ -188,6 +192,23 @@ public class MainActivity extends PreferenceActivity implements SharedPreference
             }
         }
         return false;
+    }
+
+    public ArrayList<String> getMissingPreferences() {
+        ArrayList<String> missingPreferences = new ArrayList<String>();
+        if(!preferences.isContactNumberSaved()) {
+            missingPreferences.add(getString(R.string.title_contact_number));
+        }
+        if(!preferences.isNotificationTextSaved()) {
+            missingPreferences.add(getString(R.string.title_notification_text));
+        }
+        if(!preferences.isDistanceSaved()) {
+            missingPreferences.add(getString(R.string.title_radius));
+        }
+        if(!preferences.isLocationSaved()) {
+            missingPreferences.add(getString(R.string.title_location));
+        }
+        return missingPreferences;
     }
 
     private boolean locationAccessEnabled() {

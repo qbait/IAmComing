@@ -22,4 +22,7 @@
     <string name="summary_radius">from what distance you wanna inform babe about Your visit</string>
     <string name="title_radius">distance</string>
 
+    <string name="default_notification_text">Hi Babe,\nI am coming.\nMy current address is [address].\nI am [distance] from home.</string>
+    <string name="complete_alert">complete</string>
+
 </resources>

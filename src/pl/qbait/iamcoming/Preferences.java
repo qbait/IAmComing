@@ -14,6 +14,7 @@ public class Preferences {
     public static final String PREFERENCE_CONTACT_NUMBER = "contact_number";
     public static final String PREFERENCE_NOTIFICATION_TEXT = "notification_text";
     public static final String PREFERENCE_RADIUS = "radius";
+    public static final String PREFERENCE_FIRST_RUN = "first_run";
     public static final int DEFAULT_PREFERENCE_NUMERIC = -1;
     public static final boolean DEFAULT_PREFERENCE_BOOLEAN = false;
     public static final String DEFAULT_PREFERENCE_STRING = "";
@@ -82,6 +83,10 @@ public class Preferences {
         }
     }
 
+    public boolean getFirstRun() {
+        return getBooleanPreference(PREFERENCE_FIRST_RUN, true);
+    }
+
     public void setLocation(double latitude, double longitude) {
         setLatitude(latitude);
         setLongitude(longitude);
@@ -118,6 +123,10 @@ public class Preferences {
         setIntPreference(PREFERENCE_RADIUS, value);
     }
 
+    public void setFirstRun(boolean value) {
+        setBooleanPreference(PREFERENCE_FIRST_RUN, value);
+    }
+
     private long getLongPreference(String key) {
         return preferences.getLong(key, DEFAULT_PREFERENCE_NUMERIC);
     }
@@ -132,6 +141,10 @@ public class Preferences {
 
     private boolean getBooleanPreference(String key) {
         return preferences.getBoolean(key, DEFAULT_PREFERENCE_BOOLEAN);
+    }
+
+    private boolean getBooleanPreference(String key, boolean defaultValue) {
+        return preferences.getBoolean(key, defaultValue);
     }
 
     private void setLongPreference(String key, long value) {

@@ -16,6 +16,7 @@ import java.util.Locale;
 
 public class ProximityReceiver extends BroadcastReceiver {
     private static final String TAG = "ProximityReceiver";
+    private static final int DISTANCE_USER_IS_PROBABLY_IN_DESTINATION = 500;
     private Context context;
     Preferences preferences;
 
@@ -25,7 +26,7 @@ public class ProximityReceiver extends BroadcastReceiver {
         preferences = new Preferences(context);
 
         LatLng currentLocation = getCurrentLocation();
-        if(getDistanceFromHome(currentLocation) <= 500) {
+        if(getDistanceFromHome(currentLocation) <= DISTANCE_USER_IS_PROBABLY_IN_DESTINATION) {
             Log.d(TAG, "User is probably in home");
             return;
         }
@@ -44,10 +45,18 @@ public class ProximityReceiver extends BroadcastReceiver {
         Log.d(TAG, createLogMessage(currentLocation));
     }
 
-    private String createLogMessage(LatLng currentLocation) {
+    private String getNotificationMessage(LatLng currentLocation) {
         String address = getAddress(currentLocation);
         float distance = getDistanceFromHome(currentLocation);
-        return String.format("location: [%s, %s], distance: %s m, address: %s", currentLocation.latitude+"", currentLocation.longitude+"", distance+"", address+"");
+        String notificationMessage = preferences.getNotificationText();
+        notificationMessage = notificationMessage.replace("[address]", address);
+        notificationMessage = notificationMessage.replace("[distance]", String.format("%.2g km", distance/1000));
+        return notificationMessage;
+    }
+
+    private String createLogMessage(LatLng currentLocation) {
+        String notificationMessage = getNotificationMessage(currentLocation);
+        return String.format("location: [%s, %s], notificationMessage: %s", currentLocation.latitude+"", currentLocation.longitude+"", notificationMessage);
     }
 
     private void sendSms(String address) {
