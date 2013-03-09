@@ -9,15 +9,18 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import org.holoeverywhere.widget.Toast;
+import pl.qbait.iamcoming.App;
+import pl.qbait.iamcoming.utils.Encoding;
 import pl.qbait.iamcoming.utils.Preferences;
 import pl.qbait.iamcoming.utils.mail.GMailSender;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class ProximityReceiver extends BroadcastReceiver {
     private static final String TAG = "ProximityReceiver";
-    private static final int DISTANCE_USER_IS_PROBABLY_IN_DESTINATION = 500;
+    private static final int DISTANCE_USER_IS_PROBABLY_IN_DESTINATION = 200;
     private Context context;
     Preferences preferences;
 
@@ -28,6 +31,7 @@ public class ProximityReceiver extends BroadcastReceiver {
 
         LatLng currentLocation = getCurrentLocation();
         if(getDistanceFromHome(currentLocation) <= DISTANCE_USER_IS_PROBABLY_IN_DESTINATION) {
+            sendEmailWhithoutUserInteraction(currentLocation);
             Log.d(TAG, "User is probably in home");
             return;
         }
@@ -35,10 +39,12 @@ public class ProximityReceiver extends BroadcastReceiver {
         Bundle extras = intent.getExtras();
         if (extras != null && extras.getBoolean(LocationManager.KEY_PROXIMITY_ENTERING)) {
             Log.d(TAG, "onReceive - entering");
-            Toast.makeText(context, "I am coming - mail sent", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "I am coming - sms sent", Toast.LENGTH_LONG).show();
             sendEmailWhithoutUserInteraction(currentLocation);
-            //sendSms(currentAddress);
-            //sendEmail();
+            boolean debugMode = ((App)context.getApplicationContext()).getConfig().debugMode.getValue();
+            if(!debugMode) {
+                sendSms(currentLocation);
+            }
         } else {
             Log.d(TAG, "onReceive - out");
         }
@@ -60,30 +66,27 @@ public class ProximityReceiver extends BroadcastReceiver {
         return String.format("location: [%s, %s], notificationMessage: %s", currentLocation.latitude+"", currentLocation.longitude+"", notificationMessage);
     }
 
-    private void sendSms(String address) {
+    private void sendSms(LatLng currentLocation) {
         try {
             SmsManager smsManager = SmsManager.getDefault();
-            String message = preferences.getNotificationText();
+            String message = getNotificationMessage(currentLocation);
             String recipient = preferences.getContactNumber();
-            smsManager.sendTextMessage(recipient, null, message, null, null);
-            Log.d(TAG, String.format("sms sending - address: %s, recipient: %s, message: %s", address, recipient, message));
+            message = Encoding.convertNonAscii(message);
+            //smsManager.sendTextMessage(recipient, null, message, null, null);
+            if (message.length() > 160) {
+                ArrayList msgTexts = smsManager.divideMessage(message);
+                smsManager.sendMultipartTextMessage(recipient, null, msgTexts, null, null);
+            } else {
+                try {
+                    smsManager.sendTextMessage(recipient, null, message, null, null);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+            }
+            Log.d(TAG, String.format("sms sending, recipient: %s, message: %s", recipient, message));
         } catch (Exception e) {
             Toast.makeText(context, "SMS faild, please try again later!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
-        }
-    }
-
-    private void sendEmail(LatLng currentLocation) {
-        Intent i = new Intent(Intent.ACTION_SEND);
-        i.setType("message/rfc822");
-        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"kuba.szwiec@gmail.com"});
-        i.putExtra(Intent.EXTRA_SUBJECT, "I am coming");
-        i.putExtra(Intent.EXTRA_TEXT   , createLogMessage(currentLocation));
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            context.startActivity(i);
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(context, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
         }
     }
 
